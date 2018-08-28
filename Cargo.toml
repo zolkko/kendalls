@@ -1,0 +1,14 @@
+[package]
+name = "kendalls"
+description = "Kendall's tau rank correlation"
+include = ["src/**/*.rs", "Cargo.toml"]
+version = "0.1.0"
+authors = ["zolkko <zolkko@gmail.com>"]
+documentation = "https://docs.rs/kendalls/"
+homepage = "https://github.com/zolkko/kendalls"
+repository = "https://github.com/zolkko/kendalls"
+keywords = ["statistics"]
+readme = "README.md"
+
+[dependencies]
+num-traits = "0.2.5"

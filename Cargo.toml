@@ -12,7 +12,6 @@ repository = "https://github.com/zolkko/kendalls"
 
 readme = "README.md"
 license = "MIT"
-license-file = "LICENSE"
 
 keywords = [ "statistics" ]
 categories = [ "algorithms", "science" ]

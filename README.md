@@ -4,7 +4,7 @@
 [![Travis CI Build Status](https://api.travis-ci.org/zolkko/kendalls.svg?branch=master)](https://travis-ci.org/zolkko/kendalls)
 [![docs](https://img.shields.io/badge/docs-online-5023dd.svg)](https://docs.rs/kendalls/)
 
-[Kendall rank correlation coefficient](https://en.wikipedia.org/wiki/Kendall_rank_correlation_coefficient)
+[Kendall's rank correlation coefficient](https://en.wikipedia.org/wiki/Kendall_rank_correlation_coefficient)
 
 # Usage
 

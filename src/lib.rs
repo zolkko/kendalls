@@ -273,4 +273,16 @@ mod tests {
         let res = tau_b::<i32>(&[], &[]);
         assert_eq!(res, Err(Error::InsufficientLength));
     }
+
+    #[test]
+    fn it_format_dimension_mismatch_error() {
+        let error = Error::DimensionMismatch { expected: 2, got: 1 };
+        assert_eq!("dimension mismatch: 2 != 1", format!("{}", error));
+    }
+
+    #[test]
+    fn it_format_insufficient_length_error() {
+        let error = Error::InsufficientLength {} ;
+        assert_eq!("insufficient array length", format!("{}", error));
+    }
 }

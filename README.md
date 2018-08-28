@@ -16,12 +16,12 @@ kendalls = "0.1.0"
 ```
 
 and this to your crate root:
-```rust
+```ignore
 extern crate kendalls;
 ```
 
 Example:
-```rust
+```ignore
 extern crate kendalls;
 
 use std::error::Error;

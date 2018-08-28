@@ -7,7 +7,7 @@
 //! let res = kendalls::tau_b(&[1, 2, 3], &[3, 4, 5]);
 //! assert_eq!(res, Ok(1.0));
 //! ```
-//! If you want to compute Kendall's tau for `f64` type, than you will have to
+//! If you want to compute correlation, let's say, for `f64` type, then you will have to
 //! provide either a custom comparator function or declare `Ord` trait for your custom floating point
 //! numbers type (see [float](https://crates.io/crates/float) crate).
 //!

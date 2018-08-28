@@ -1,14 +1,26 @@
 [package]
 name = "kendalls"
 description = "Kendall's tau rank correlation"
-include = ["src/**/*.rs", "Cargo.toml"]
 version = "0.1.0"
 authors = ["zolkko <zolkko@gmail.com>"]
+
+include = ["src/**/*.rs", "Cargo.toml"]
+
 documentation = "https://docs.rs/kendalls/"
 homepage = "https://github.com/zolkko/kendalls"
 repository = "https://github.com/zolkko/kendalls"
-keywords = ["statistics"]
+
 readme = "README.md"
+license = "MIT"
+license-file = "LICENSE"
+
+keywords = [ "statistics" ]
+categories = [ "algorithms", "science" ]
+
+[badges]
+travis-ci = { repository = "zolkko/kendalls", branch = "master" }
+codecov = { repository = "zolkko/kendalls", branch = "master", service = "github" }
 
 [dependencies]
 num-traits = "0.2.5"
+

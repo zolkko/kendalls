@@ -7,10 +7,21 @@ rust:
 
 sudo: required
 
+dist: trusty
+
+cache: cargo
+
 script:
   - cargo test
   - rustdoc --test README.md -L target
   - cargo doc --no-deps || echo "skipping cargo doc"
+
+after_success: |
+  if [[ "$TRAVIS_RUST_VERSION" == stable ]]; then
+    RUSTFLAGS="--cfg procmacro2_semver_exempt" cargo install cargo-tarpaulin
+    cargo tarpaulin --out Xml
+    bash <(curl -s https://codecov.io/bash)
+  fi
 
 notifications:
   email:
@@ -19,10 +30,4 @@ notifications:
 addons:
   apt:
     packages:
-      - libcurl4-openssl-dev
-      - libelf-dev
-      - libdw-dev
-      - cmake
-      - gcc
-      - binutils-dev
-      - libiberty-dev
+      - libssl-dev

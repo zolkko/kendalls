@@ -22,7 +22,7 @@
 //! assert_eq!(res, Ok(1.0));
 //! ```
 //!
-//! Function may return an error if there you have passed an empty arrays or `x` and `y` arrays'
+//! The function will return an error if you pass empty arrays into it or `x` and `y` arrays'
 //! dimensions are not equal.
 extern crate num_traits;
 

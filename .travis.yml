@@ -1,0 +1,28 @@
+language: rust
+rust:
+- stable
+- beta
+- nightly
+sudo: required
+dist: trusty
+cache: cargo
+script:
+- cargo test
+- rustdoc --test README.md -L target
+- cargo doc --no-deps || echo "skipping cargo doc"
+after_success: |
+  if [[ "$TRAVIS_RUST_VERSION" == stable ]]; then
+    RUSTFLAGS="--cfg procmacro2_semver_exempt" cargo install cargo-tarpaulin
+    cargo tarpaulin --out Xml
+    bash <(curl -s https://codecov.io/bash)
+  fi
+notifications:
+  email:
+    on_success: never
+addons:
+  apt:
+    packages:
+    - libssl-dev
+env:
+  global:
+    secure: gjowuKwGYYaJss7PD/isNqIHD4dMOVrkEEo10b860IuGQ78VkeeZybhvQ6ls/VhevRBfRdaUtu+mtiFHO8lkEB65OnINLTT3sa/ayNSjKSpKl08h3SM18jBKSa7+mduPfV0LwVh/OvSXnRdfzxrIAnKjmO/wLVtEjEUQ0bH3BH68LOPUqK4g8zoVb6u0g7WXzAp5PuJz9vbo8zMBn5pgyF2pjydx2b8KkjdTCsQwY+l8dZKZZYMbAX0tLE4N8dMzwCzEilzkNzQELZ9raiLl/soN1TNxOcSntTe9OT1wQA8sbVhxkEEcFq/R9LSh951DKnCjLCmATswYgvASL6L9kySdOoHdibfNbdRF+0c/JpSQRqhPDBdb+ts11jpwqXwfvEci42D6HdQwPK1tQjqYuMOO9r8RFk7a9uIcE+hfIuNqoMBl7ZuT+U0MnyIjkXN8/Km7sTrzmoRU8ao6IL5JyDWYNHAjN/n7HPVrhjn1o16dhtcPMoD8P/vMR4Y2kPluaMGEgI6we0/aaXML7fMP/wu3BHxK5iv7UdjkngEqBxGACyGkkw8v5DHRNGITCTagaWhS+fj+vI78WtP9RB0jFsr41huWOHAVvucdt3GA8C3h6eqCyWnnab5159CDvaxJSXYZXwSHxWQ0eWA18bsU9X1BtiDusityocyONHk17+g=

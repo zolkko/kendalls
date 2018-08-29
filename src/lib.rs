@@ -1,6 +1,7 @@
 //! [Kendall's tau rank correlation](https://en.wikipedia.org/wiki/Kendall_rank_correlation_coefficient).
 //! At this point this is basically a copy-paste
-//! from [Apache Commons Math](http://commons.apache.org/proper/commons-math/) library.
+//! from [Apache Commons Math](http://commons.apache.org/proper/commons-math/) library with some
+//! additions taken from [scipy](https://github.com/scipy/scipy).
 //!
 //! Example usage:
 //! ```
@@ -26,7 +27,7 @@
 //! dimensions are not equal.
 extern crate num_traits;
 
-use num_traits::{AsPrimitive, Num};
+use num_traits::AsPrimitive;
 use std::cmp::Ordering;
 use std::error::Error as StdError;
 use std::fmt::{Display, Error as FmtError, Formatter};
@@ -62,7 +63,7 @@ impl StdError for Error {}
 /// both x and y, it is not added to either T or U.
 pub fn tau_b<T>(x: &[T], y: &[T]) -> Result<f64, Error>
 where
-    T: Num + Ord + Clone + Default,
+    T: Ord + Clone + Default,
 {
     tau_b_with_comparator(x, y, |a, b| a.cmp(b))
 }
@@ -71,7 +72,7 @@ where
 /// which [Ord] trait is not defined.
 pub fn tau_b_with_comparator<T, F>(x: &[T], y: &[T], mut comparator: F) -> Result<f64, Error>
 where
-    T: Num + Clone + Default,
+    T: PartialOrd + Clone + Default,
     F: FnMut(&T, &T) -> Ordering,
 {
     if x.len() != y.len() {
@@ -86,7 +87,6 @@ where
     }
 
     let n = x.len();
-    let num_pairs = sum(n - 1);
 
     let mut pairs: Vec<(T, T)> = Vec::with_capacity(n);
     for pair in x.iter().cloned().zip(y.iter().cloned()) {
@@ -188,17 +188,34 @@ where
     tied_y_pairs += sum(consecutive_y_ties - 1);
 
     // to prevent overflow on subtraction
-    let num_pairs_f: f64 = num_pairs.as_();
+    let num_pairs_f: f64 = ((n * (n - 1)) as f64) / 2.0; // sum(n - 1).as_();
     let tied_x_pairs_f: f64 = tied_x_pairs.as_();
     let tied_y_pairs_f: f64 = tied_y_pairs.as_();
     let tied_xy_pairs_f: f64 = tied_xy_pairs.as_();
     let swaps_f: f64 = (2 * swaps).as_();
 
+    // Note that tot = con + dis + (xtie - ntie) + (ytie - ntie) + ntie
+    //               = con + dis + xtie + ytie - ntie
+    //
+    //           C-D = tot - xtie - ytie + ntie - 2 * dis
     let concordant_minus_discordant =
         num_pairs_f - tied_x_pairs_f - tied_y_pairs_f + tied_xy_pairs_f - swaps_f;
     let non_tied_pairs_multiplied = (num_pairs_f - tied_x_pairs_f) * (num_pairs_f - tied_y_pairs_f);
 
-    Ok(concordant_minus_discordant / non_tied_pairs_multiplied.sqrt())
+    let tau = concordant_minus_discordant / non_tied_pairs_multiplied.sqrt();
+
+    // limit range to fix computational errors
+    Ok(tau.max(-1.0).min(1.0))
+}
+
+/// Calculate statistical significance: Z.
+///
+/// Typically any value greater than 1.96 is going to be statistically significant
+/// against the Z-table with alpha set at 0.5.
+pub fn significance(tau: f64, n: usize) -> f64 {
+    let n_tmp: f64 = (n * (n - 1)).as_();
+    let deter: f64 = (2 * (2 * n + 5)).as_();
+    (3.0 * tau * n_tmp.sqrt()) / deter.sqrt()
 }
 
 #[inline]

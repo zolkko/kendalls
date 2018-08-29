@@ -211,7 +211,7 @@ where
 /// Calculate statistical significance: Z.
 ///
 /// Typically any value greater than 1.96 is going to be statistically significant
-/// against the Z-table with alpha set at 0.5.
+/// against the Z-table with alpha set at 0.05.
 pub fn significance(tau: f64, n: usize) -> f64 {
     let n_tmp: f64 = (n * (n - 1)).as_();
     let deter: f64 = (2 * (2 * n + 5)).as_();
@@ -301,5 +301,12 @@ mod tests {
     fn it_format_insufficient_length_error() {
         let error = Error::InsufficientLength {} ;
         assert_eq!("insufficient array length", format!("{}", error));
+    }
+
+    #[test]
+    fn significance_computed_correctly_for_certain_values() {
+        let res = significance(0.818, 12);
+        assert!(res > 3.7009);
+        assert!(res < 3.709);
     }
 }

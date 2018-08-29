@@ -1,6 +1,6 @@
 # kendalls
 
-[![Crates.io](https://img.shields.io/crates/d/kendalls.svg)](https://crates.io/crates/kendalls)
+[![crates.io](https://img.shields.io/crates/v/kendalls.svg)](https://crates.io/crates/kendalls)
 [![Travis CI Build Status](https://travis-ci.org/zolkko/kendalls.svg?branch=master)](https://travis-ci.org/zolkko/kendalls)
 [![codecov](https://codecov.io/gh/zolkko/kendalls/branch/master/graph/badge.svg)](https://codecov.io/gh/zolkko/kendalls)
 [![docs](https://img.shields.io/badge/docs-online-5023dd.svg)](https://docs.rs/kendalls/)

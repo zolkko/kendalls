@@ -25,9 +25,6 @@
 //!
 //! The function will return an error if you pass empty arrays into it or `x` and `y` arrays'
 //! dimensions are not equal.
-extern crate num_traits;
-
-use num_traits::AsPrimitive;
 use std::cmp::Ordering;
 use std::error::Error as StdError;
 use std::fmt::{Display, Error as FmtError, Formatter};
@@ -189,10 +186,10 @@ where
 
     // to prevent overflow on subtraction
     let num_pairs_f: f64 = ((n * (n - 1)) as f64) / 2.0; // sum(n - 1).as_();
-    let tied_x_pairs_f: f64 = tied_x_pairs.as_();
-    let tied_y_pairs_f: f64 = tied_y_pairs.as_();
-    let tied_xy_pairs_f: f64 = tied_xy_pairs.as_();
-    let swaps_f: f64 = (2 * swaps).as_();
+    let tied_x_pairs_f: f64 = tied_x_pairs as f64;
+    let tied_y_pairs_f: f64 = tied_y_pairs as f64;
+    let tied_xy_pairs_f: f64 = tied_xy_pairs as f64;
+    let swaps_f: f64 = (2 * swaps) as f64;
 
     // Note that tot = con + dis + (xtie - ntie) + (ytie - ntie) + ntie
     //               = con + dis + xtie + ytie - ntie
@@ -213,8 +210,9 @@ where
 /// Typically any value greater than 1.96 is going to be statistically significant
 /// against the Z-table with alpha set at 0.05.
 pub fn significance(tau: f64, n: usize) -> f64 {
-    let n_tmp: f64 = (n * (n - 1)).as_();
-    let deter: f64 = (2 * (2 * n + 5)).as_();
+
+    let n_tmp: f64 = (n * (n - 1)) as f64;
+    let deter: f64 = (2 * (2 * n + 5)) as f64;
     (3.0 * tau * n_tmp.sqrt()) / deter.sqrt()
 }
 

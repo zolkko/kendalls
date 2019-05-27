@@ -1,10 +1,11 @@
 [package]
 name = "kendalls"
 description = "Kendall's tau rank correlation"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["zolkko <zolkko@gmail.com>"]
 
 include = ["src/**/*.rs", "Cargo.toml"]
+exclude = ["/.travis.yml"]
 
 documentation = "https://docs.rs/kendalls/"
 homepage = "https://github.com/zolkko/kendalls"
@@ -21,5 +22,3 @@ travis-ci = { repository = "zolkko/kendalls", branch = "master" }
 codecov = { repository = "zolkko/kendalls", branch = "master", service = "github" }
 
 [dependencies]
-num-traits = "0.2.5"
-

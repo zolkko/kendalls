@@ -5,7 +5,6 @@ version = "0.1.2"
 authors = ["zolkko <zolkko@gmail.com>"]
 
 include = ["src/**/*.rs", "Cargo.toml"]
-exclude = ["/.travis.yml"]
 
 documentation = "https://docs.rs/kendalls/"
 homepage = "https://github.com/zolkko/kendalls"

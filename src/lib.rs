@@ -27,7 +27,7 @@
 //! dimensions are not equal.
 use std::cmp::Ordering;
 use std::error::Error as StdError;
-use std::fmt::{Display, Error as FmtError, Formatter};
+use std::fmt::{Display, Error as FmtError, Formatter, Debug};
 use std::result::Result;
 
 #[derive(Debug, PartialEq)]
@@ -126,10 +126,7 @@ where
     tied_xy_pairs += sum(consecutive_xy_ties - 1);
 
     let mut swaps = 0usize;
-    let mut pairs_dest: Vec<(T, T)> = Vec::with_capacity(n);
-    for _ in 0..n {
-        pairs_dest.push((Default::default(), Default::default()));
-    }
+    let mut pairs_dest: Vec<(T, T)> = vec![(Default::default(), Default::default()); n];
 
     let mut segment_size = 1usize;
     while segment_size < n {
@@ -143,13 +140,15 @@ where
             while i < i_end || j < j_end {
                 if i < i_end {
                     if j < j_end {
-                        if comparator(&pairs[i].1, &pairs[j].1) == Ordering::Less {
-                            pairs_dest[copy_location] = pairs[i].clone();
-                            i += 1;
-                        } else {
+                        let a = &pairs[i].1;
+                        let b = &pairs[j].1;
+                        if comparator(a, b) == Ordering::Greater {
                             pairs_dest[copy_location] = pairs[j].clone();
                             j += 1;
                             swaps += i_end - i;
+                        } else {
+                            pairs_dest[copy_location] = pairs[i].clone();
+                            i += 1;
                         }
                     } else {
                         pairs_dest[copy_location] = pairs[i].clone();
@@ -225,6 +224,22 @@ fn sum(n: usize) -> usize {
 mod tests {
 
     use super::*;
+
+
+    #[test]
+    fn shifted_test() {
+        let comparator = |a: &f64, b: &f64| a.partial_cmp(&b).unwrap_or(Ordering::Greater);
+
+        let x = &[1.0, 1.0, 2.0, 2.0, 3.0, 3.0];
+        let y = &[1.0, 2.0, 2.0, 3.0, 3.0, 4.0];
+        let res = tau_b_with_comparator(&x[..], &y[..], comparator).unwrap();
+        approx::assert_abs_diff_eq!(res, 0.8006407690254358);
+
+        let x = &[12.0, 2.0, 1.0, 12.0, 2.0];
+        let y = &[1.0, 4.0, 7.0, 1.0, 0.0];
+        let res = tau_b_with_comparator(&x[..], &y[..], comparator).unwrap();
+        approx::assert_abs_diff_eq!(res, -0.4714045207910316);
+    }
 
     #[test]
     fn simple_correlated_data() {

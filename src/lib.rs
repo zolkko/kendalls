@@ -67,6 +67,7 @@ where
 
 /// The same as `tau_b` but also allow to specify custom comparator for numbers for
 /// which [Ord] trait is not defined.
+#[allow(clippy::many_single_char_names)]
 pub fn tau_b_with_comparator<T, F>(x: &[T], y: &[T], mut comparator: F) -> Result<f64, Error>
 where
     T: PartialOrd + Clone + Default,

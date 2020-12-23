@@ -12,7 +12,7 @@
 Add this to your Cargo.toml:
 ```toml
 [dependencies]
-kendalls = "0.1.1"
+kendalls = "0.1.6"
 ```
 
 and this to your crate root:
@@ -32,4 +32,3 @@ fn main() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 ```
-# kendalls-py

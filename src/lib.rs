@@ -27,7 +27,7 @@
 //! dimensions are not equal.
 use std::cmp::Ordering;
 use std::error::Error as StdError;
-use std::fmt::{Display, Error as FmtError, Formatter, Debug};
+use std::fmt::{Display, Error as FmtError, Formatter};
 use std::result::Result;
 
 #[derive(Debug, PartialEq)]
@@ -114,6 +114,7 @@ where
                 consecutive_xy_ties += 1;
             } else {
                 tied_xy_pairs += sum(consecutive_xy_ties - 1);
+                consecutive_xy_ties = 1;
             }
         } else {
             tied_x_pairs += sum(consecutive_x_ties - 1);
@@ -226,6 +227,23 @@ mod tests {
 
     use super::*;
 
+    #[test]
+    fn xy_consecutive_pair_test() {
+        let x = vec![
+            12.0, 14.0, 14.0, 17.0, 19.0, 19.0, 19.0, 19.0, 19.0, 20.0, 21.0, 21.0, 21.0, 21.0, 21.0,
+            22.0, 23.0, 24.0, 24.0, 24.0, 26.0, 26.0, 27.0,
+        ];
+        let y = vec![
+            11.0, 4.0, 4.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 4.0, 0.0, 4.0, 0.0, 0.0, 0.0, 0.0, 4.0,
+            0.0, 0.0, 0.0, 0.0, 0.0,
+        ];
+
+        let tau = tau_b_with_comparator(&x, &y, |a: &f64, b: &f64| {
+            a.partial_cmp(&b).unwrap_or(Ordering::Greater)
+        }).unwrap();
+
+        approx::assert_abs_diff_eq!(tau, -0.3762015410475098);
+    }
 
     #[test]
     fn shifted_test() {

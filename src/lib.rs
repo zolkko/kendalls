@@ -30,19 +30,131 @@ use std::error::Error as StdError;
 use std::fmt::{Display, Error as FmtError, Formatter};
 use std::result::Result;
 
+
+#[derive(Debug)]
+pub struct Correlation {
+    corr: f64,
+}
+
+impl Correlation {
+    pub fn correlation(&self) -> f64 {
+        self.corr
+    }
+
+    pub fn pvalue(&self) -> f64 {
+        // _kendall_p_exact(n, int(min(C, (n*(n-1))//2-C)))
+        todo!()
+    }
+}
+
+fn factorial(num: usize) -> f64 {
+    (1..=num).into_iter().map(|x| x as f64).product()
+}
+
+fn cumsum<T>(input: &[T]) -> Vec<T>
+where
+    T: std::ops::AddAssign + Copy + Default,
+{
+    let zero = Default::default();
+    input
+        .iter()
+        .scan(zero, |acc, &x| {
+            *acc += x;
+            Some(*acc)
+        })
+        .collect()
+}
+
+/// Exact p-value, see Maurice G. Kendall, "Rank Correlation Methods" (4th Edition), Charles Griffin & Co., 1970.
+fn p_exact(n: usize, c: usize) -> Result<f64, Error> {
+    let c4 = 4 * c;
+    let n2 = n * (n - 1);
+
+    let prob = if n == 0 {
+        return Err(Error::NMustBePositive(n));
+    } else if c < 0 || c4 > n2 {
+        return Err(Error::CNotSatisfied(c));
+    } else if n == 1 {
+        1.0
+    } else if n == 2 {
+        1.0
+    } else if c == 0 {
+        if n < 171 {
+            2.0 / factorial(n)
+        } else {
+            0.0
+        }
+    } else if c == 1 {
+        if n < 172 {
+            2.0 / factorial(n - 1)
+        } else {
+            0.0
+        }
+    } else if c4 == n2 {
+        1.0
+    } else if n < 171 {
+        let mut new = Vec::with_capacity(c + 1);
+        for i in 0..(c + 1) {
+            if i < 2 {
+                new.push(1.0);
+            } else {
+                new.push(0.0);
+            }
+        }
+
+        for j in 3..(n + 1) {
+            new = cumsum(&new[..]);
+            if j <= c {
+                // new[j:] -= new[:c + 1 - j]
+            }
+        }
+
+        2.0 * new.iter().sum::<f64>() / factorial(n)
+    } else {
+        let mut new = Vec::with_capacity(c + 1);
+        for i in 0..(c + 1) {
+            if i < 2 {
+                new.push(1.0);
+            } else {
+                new.push(0.0);
+            }
+        }
+
+        for j in 3..(n + 1) {
+            new = new
+                .iter()
+                .scan(0.0, |acc, &x| {
+                    *acc += x;
+                    Some(*acc / (j as f64))
+                })
+                .collect();
+            if j <= c {
+                // new[j:] -= new[:c+1-j]
+            }
+        }
+
+        new.iter().sum()
+    };
+
+    Ok(prob.max(0.0).min(1.0))
+}
+
 #[derive(Debug, PartialEq)]
 pub enum Error {
     DimensionMismatch { expected: usize, got: usize },
     InsufficientLength,
+    NMustBePositive(usize),
+    /// c must satisfy 0 <= 4c <= n(n-1)
+    CNotSatisfied(usize),
 }
 
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter) -> Result<(), FmtError> {
         match self {
             Error::InsufficientLength => write!(f, "insufficient array length"),
-            Error::DimensionMismatch { expected, got } => {
-                write!(f, "dimension mismatch: {} != {}", expected, got)
-            }
+            Error::DimensionMismatch { expected, got } => write!(f, "dimension mismatch: {} != {}", expected, got),
+            Error::NMustBePositive(n) => write!(f, "n ({}) must be positive", n),
+            Error::CNotSatisfied(c) => write!(f, "c ({}) must satisfy 0 <= 4c <= n(n-1)", c),
         }
     }
 }
@@ -58,7 +170,7 @@ impl StdError for Error {}
 /// where P is the number of concordant pairs, Q the number of discordant pairs, T the number of
 /// ties only in x, and U the number of ties only in y. If a tie occurs for the same pair in
 /// both x and y, it is not added to either T or U.
-pub fn tau_b<T>(x: &[T], y: &[T]) -> Result<f64, Error>
+pub fn tau_b<T>(x: &[T], y: &[T]) -> Result<Correlation, Error>
 where
     T: Ord + Clone + Default,
 {
@@ -68,7 +180,7 @@ where
 /// The same as `tau_b` but also allow to specify custom comparator for numbers for
 /// which [Ord] trait is not defined.
 #[allow(clippy::many_single_char_names)]
-pub fn tau_b_with_comparator<T, F>(x: &[T], y: &[T], mut comparator: F) -> Result<f64, Error>
+pub fn tau_b_with_comparator<T, F>(x: &[T], y: &[T], mut comparator: F) -> Result<Correlation, Error>
 where
     T: PartialOrd + Clone + Default,
     F: FnMut(&T, &T) -> Ordering,
@@ -203,7 +315,10 @@ where
     let tau = concordant_minus_discordant / non_tied_pairs_multiplied.sqrt();
 
     // limit range to fix computational errors
-    Ok(tau.max(-1.0).min(1.0))
+    let corr = tau.max(-1.0).min(1.0);
+
+    // return result
+    Ok(Correlation { corr, })
 }
 
 /// Calculate statistical significance: Z.

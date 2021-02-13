@@ -313,9 +313,7 @@ where
     let non_tied_pairs_multiplied = (num_pairs_f - tied_x_pairs_f) * (num_pairs_f - tied_y_pairs_f);
 
     let tau = concordant_minus_discordant / non_tied_pairs_multiplied.sqrt();
-
-    // limit range to fix computational errors
-    let corr = tau.max(-1.0).min(1.0);
+    let corr = tau.clamp(-1.0, 1.0);
 
     // return result
     Ok(Correlation { corr, })

@@ -119,29 +119,14 @@ where
                 consecutive_xy_ties = 1;
             }
         } else {
-            // TODO: refactor
-            vt += consecutive_x_ties * (consecutive_x_ties - 1) * (2 * consecutive_x_ties + 5);
-            v1_part_1 += consecutive_x_ties * (consecutive_x_ties - 1);
-
-            let consecutive_x_ties_i = consecutive_x_ties as isize;
-            v2_part_1 += consecutive_x_ties_i * (consecutive_x_ties_i - 1) * (consecutive_x_ties_i - 2);
-
-            tied_x_pairs += sum(consecutive_x_ties - 1);
+            update_x_group(&mut vt, &mut tied_x_pairs, &mut tied_xy_pairs, &mut v1_part_1, &mut v2_part_1, consecutive_x_ties, consecutive_xy_ties);
             consecutive_x_ties = 1;
-            tied_xy_pairs += sum(consecutive_xy_ties - 1);
             consecutive_xy_ties = 1;
 
         }
     }
 
-    vt += consecutive_x_ties * (consecutive_x_ties - 1) * (2 * consecutive_x_ties + 5);
-    v1_part_1 += consecutive_x_ties * (consecutive_x_ties - 1);
-
-    let consecutive_x_ties_i = consecutive_x_ties as isize;
-    v2_part_1 += consecutive_x_ties_i * (consecutive_x_ties_i - 1) * (consecutive_x_ties_i - 2);
-
-    tied_x_pairs += sum(consecutive_x_ties - 1);
-    tied_xy_pairs += sum(consecutive_xy_ties - 1);
+    update_x_group(&mut vt, &mut tied_x_pairs, &mut tied_xy_pairs, &mut v1_part_1, &mut v2_part_1, consecutive_x_ties, consecutive_xy_ties);
 
     let mut swaps = 0usize;
     let mut pairs_dest: Vec<(T, T)> = vec![(Default::default(), Default::default()); n];
@@ -197,30 +182,18 @@ where
         if curr.1 == prev.1 {
             consecutive_y_ties += 1;
         } else {
-            // TODO: refactor
-            vu += consecutive_y_ties * (consecutive_y_ties - 1) * (2 * consecutive_y_ties + 5);
-            v1_part_2 += consecutive_y_ties * (consecutive_y_ties - 1);
-
-            let consecutive_y_ties_i = consecutive_y_ties as isize;
-            v2_part_2 += consecutive_y_ties_i * (consecutive_y_ties_i - 1) * (consecutive_y_ties_i - 2);
-            
-            tied_y_pairs += sum(consecutive_y_ties - 1);
+            update_y_group(&mut vu, &mut tied_y_pairs, &mut v1_part_2, &mut v2_part_2, consecutive_y_ties);
             consecutive_y_ties = 1;
         }
     }
 
-    vu += consecutive_y_ties * (consecutive_y_ties - 1) * (2 * consecutive_y_ties + 5);
-    v1_part_2 += consecutive_y_ties * (consecutive_y_ties - 1);
+    update_y_group(&mut vu, &mut tied_y_pairs, &mut v1_part_2, &mut v2_part_2, consecutive_y_ties);
 
-    let consecutive_y_ties_i = consecutive_y_ties as isize;
-    v2_part_2 += consecutive_y_ties_i * (consecutive_y_ties_i - 1) * (consecutive_y_ties_i - 2);
-
-    tied_y_pairs += sum(consecutive_y_ties - 1);
-
+    // Generates T1 and T2 for significance
     let v1 = (v1_part_1 * v1_part_2) as f64;
     let v2 = (v2_part_1 * v2_part_2) as f64;
 
-    // to prevent overflow on subtraction
+    // Prevents overflow on subtraction
     let num_pairs_f: f64 = ((n * (n - 1)) as f64) / 2.0; // sum(n - 1).as_();
     let tied_x_pairs_f: f64 = tied_x_pairs as f64;
     let tied_y_pairs_f: f64 = tied_y_pairs as f64;
@@ -255,6 +228,29 @@ where
 #[inline]
 fn sum(n: usize) -> usize {
     n * (n + 1 as usize) / 2 as usize
+}
+
+/// Updated vt, v1_part_1, v2_part_1, tied_x_pairs, tied_xy_pairs variables with current tied group in X
+fn update_x_group(vt: &mut usize, tied_x_pairs: &mut usize, tied_xy_pairs: &mut usize, v1_part_1: &mut usize, v2_part_1: & mut isize, consecutive_x_ties: usize, consecutive_xy_ties: usize) {
+    *vt += consecutive_x_ties * (consecutive_x_ties - 1) * (2 * consecutive_x_ties + 5);
+    *v1_part_1 += consecutive_x_ties * (consecutive_x_ties - 1);
+
+    let consecutive_x_ties_i = consecutive_x_ties as isize;
+    *v2_part_1 += consecutive_x_ties_i * (consecutive_x_ties_i - 1) * (consecutive_x_ties_i - 2);
+
+    *tied_x_pairs += sum(consecutive_x_ties - 1);
+    *tied_xy_pairs += sum(consecutive_xy_ties - 1);
+}
+
+/// Updated vu, tied_y_pairs, v1_part_2 and v2_part_2 variables with current tied group in Y
+fn update_y_group(vu: &mut usize, tied_y_pairs: &mut usize, v1_part_2: &mut usize, v2_part_2: & mut isize, consecutive_y_ties: usize) {
+    *vu += consecutive_y_ties * (consecutive_y_ties - 1) * (2 * consecutive_y_ties + 5);
+    *v1_part_2 += consecutive_y_ties * (consecutive_y_ties - 1);
+
+    let consecutive_y_ties_i = consecutive_y_ties as isize;
+    *v2_part_2 += consecutive_y_ties_i * (consecutive_y_ties_i - 1) * (consecutive_y_ties_i - 2);
+    
+    *tied_y_pairs += sum(consecutive_y_ties - 1);
 }
 
 #[cfg(test)]

@@ -87,11 +87,7 @@ where
 
     let n = x.len();
 
-    // TODO: refactor
-    let mut pairs: Vec<(T, T)> = Vec::with_capacity(n);
-    for pair in x.iter().cloned().zip(y.iter().cloned()) {
-        pairs.push(pair);
-    }
+    let mut pairs: Vec<(T, T)> = x.iter().cloned().zip(y.iter().cloned()).collect();
 
     pairs.sort_by(|pair1, pair2| {
         let res = comparator(&pair1.0, &pair2.0);

@@ -4,7 +4,8 @@ description = "Kendall's tau rank correlation"
 version = "0.2.0"
 authors = [
 	"zolkko <zolkko@gmail.com>",
-	"Genaro Camele <genarocamele@gmail.com>"
+	"Genaro Camele <genarocamele@gmail.com>",
+	"Matías Ignacio Caruso"
 ]
 
 include = ["src/**/*.rs", "Cargo.toml"]

@@ -7,7 +7,7 @@ sudo: required
 dist: trusty
 cache: cargo
 script:
-- cargo install clippy
+- rustup component add clippy
 - cargo clippy -- -D warnings
 - cargo test
 - cargo doc --no-deps || echo "skipping cargo doc"

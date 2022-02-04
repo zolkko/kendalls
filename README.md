@@ -22,14 +22,13 @@ extern crate kendalls;
 ```
 
 Example:
+
 ```rust
-extern crate kendalls;
+fn main() -> Result<(), kendalls::Error> {
+    let (tau_b, significance) = kendalls::tau_b(&[1, 2, 3], &[3, 4, 5])?;
+    assert_eq!(tau_b, 1.0);
+    assert_eq!(significance, 1.5666989036012806);
 
-use std::error::Error;
-
-fn main() -> Result<(), Box<dyn Error>> {
-    let correlation = kendalls::tau_b(&[1,2,3], &[3,2,1])?;
-    println!("correlation = {:?} == -1.0", correlation);
     Ok(())
 }
 ```

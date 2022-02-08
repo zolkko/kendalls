@@ -6,8 +6,9 @@
 //!
 //! Example usage:
 //! ```
-//! let res = kendalls::tau_b(&[1, 2, 3], &[3, 4, 5]);
-//! assert_eq!(res, Ok((1.0, 1.5666989036012806)));
+//! let (tau_b, significance) = kendalls::tau_b(&[1, 2, 3], &[3, 4, 5]).unwrap();
+//! assert_eq!(tau_b, 1.0);
+//! assert_eq!(significance, 1.5666989036012806);
 //! ```
 //! If you want to compute correlation, let's say, for `f64` type, then you will have to
 //! provide either a custom comparator function or declare `Ord` trait for your custom floating point
@@ -16,11 +17,11 @@
 //! ```
 //! use std::cmp::Ordering;
 //!
-//! let (tau_b, _) = kendalls::tau_b_with_comparator(
-//!            &[1.0, 2.0],
-//!            &[3.0, 4.0],
-//!            |a: &f64, b: &f64| a.partial_cmp(&b).unwrap_or(Ordering::Greater),
-//!        ).unwrap();
+//! let (tau_b, _significance) = kendalls::tau_b_with_comparator(
+//!     &[1.0, 2.0],
+//!     &[3.0, 4.0],
+//!     |a: &f64, b: &f64| a.partial_cmp(&b).unwrap_or(Ordering::Greater),
+//! ).unwrap();
 //! assert_eq!(tau_b, 1.0);
 //! ```
 //!
@@ -119,14 +120,29 @@ where
                 consecutive_xy_ties = 1;
             }
         } else {
-            update_x_group(&mut vt, &mut tied_x_pairs, &mut tied_xy_pairs, &mut v1_part_1, &mut v2_part_1, consecutive_x_ties, consecutive_xy_ties);
+            update_x_group(
+                &mut vt,
+                &mut tied_x_pairs,
+                &mut tied_xy_pairs,
+                &mut v1_part_1,
+                &mut v2_part_1,
+                consecutive_x_ties,
+                consecutive_xy_ties,
+            );
             consecutive_x_ties = 1;
             consecutive_xy_ties = 1;
-
         }
     }
 
-    update_x_group(&mut vt, &mut tied_x_pairs, &mut tied_xy_pairs, &mut v1_part_1, &mut v2_part_1, consecutive_x_ties, consecutive_xy_ties);
+    update_x_group(
+        &mut vt,
+        &mut tied_x_pairs,
+        &mut tied_xy_pairs,
+        &mut v1_part_1,
+        &mut v2_part_1,
+        consecutive_x_ties,
+        consecutive_xy_ties,
+    );
 
     let mut swaps = 0usize;
     let mut pairs_dest: Vec<(T, T)> = vec![(Default::default(), Default::default()); n];
@@ -182,12 +198,24 @@ where
         if curr.1 == prev.1 {
             consecutive_y_ties += 1;
         } else {
-            update_y_group(&mut vu, &mut tied_y_pairs, &mut v1_part_2, &mut v2_part_2, consecutive_y_ties);
+            update_y_group(
+                &mut vu,
+                &mut tied_y_pairs,
+                &mut v1_part_2,
+                &mut v2_part_2,
+                consecutive_y_ties,
+            );
             consecutive_y_ties = 1;
         }
     }
 
-    update_y_group(&mut vu, &mut tied_y_pairs, &mut v1_part_2, &mut v2_part_2, consecutive_y_ties);
+    update_y_group(
+        &mut vu,
+        &mut tied_y_pairs,
+        &mut v1_part_2,
+        &mut v2_part_2,
+        consecutive_y_ties,
+    );
 
     // Generates T1 and T2 for significance
     let v1 = (v1_part_1 * v1_part_2) as f64;
@@ -215,8 +243,13 @@ where
     // Significance
     let v0 = (n * (n - 1)) * (2 * n + 5);
     let n_f = n as f64;
-            
-    let var_s = (v0 - vt - vu) as f64 / 18.0 + v1 / (2.0 * n_f * (n_f - 1.0)) + v2 / (9.0 * n_f * (n_f - 1.0) * (n_f - 2.0));
+
+    let v0_isize = v0 as isize;
+    let vt_isize = vt as isize;
+    let vu_isize = vu as isize;
+    let var_s = (v0_isize - vt_isize - vu_isize) as f64 / 18.0
+        + v1 / (2.0 * n_f * (n_f - 1.0))
+        + v2 / (9.0 * n_f * (n_f - 1.0) * (n_f - 2.0));
 
     let s = tau_b * non_tied_pairs_multiplied.sqrt();
     let z = s / var_s.sqrt();
@@ -227,11 +260,19 @@ where
 
 #[inline]
 fn sum(n: usize) -> usize {
-    n * (n + 1 as usize) / 2 as usize
+    n * (n + 1_usize) / 2_usize
 }
 
 /// Updated vt, v1_part_1, v2_part_1, tied_x_pairs, tied_xy_pairs variables with current tied group in X
-fn update_x_group(vt: &mut usize, tied_x_pairs: &mut usize, tied_xy_pairs: &mut usize, v1_part_1: &mut usize, v2_part_1: & mut isize, consecutive_x_ties: usize, consecutive_xy_ties: usize) {
+fn update_x_group(
+    vt: &mut usize,
+    tied_x_pairs: &mut usize,
+    tied_xy_pairs: &mut usize,
+    v1_part_1: &mut usize,
+    v2_part_1: &mut isize,
+    consecutive_x_ties: usize,
+    consecutive_xy_ties: usize,
+) {
     *vt += consecutive_x_ties * (consecutive_x_ties - 1) * (2 * consecutive_x_ties + 5);
     *v1_part_1 += consecutive_x_ties * (consecutive_x_ties - 1);
 
@@ -243,13 +284,19 @@ fn update_x_group(vt: &mut usize, tied_x_pairs: &mut usize, tied_xy_pairs: &mut 
 }
 
 /// Updated vu, tied_y_pairs, v1_part_2 and v2_part_2 variables with current tied group in Y
-fn update_y_group(vu: &mut usize, tied_y_pairs: &mut usize, v1_part_2: &mut usize, v2_part_2: & mut isize, consecutive_y_ties: usize) {
+fn update_y_group(
+    vu: &mut usize,
+    tied_y_pairs: &mut usize,
+    v1_part_2: &mut usize,
+    v2_part_2: &mut isize,
+    consecutive_y_ties: usize,
+) {
     *vu += consecutive_y_ties * (consecutive_y_ties - 1) * (2 * consecutive_y_ties + 5);
     *v1_part_2 += consecutive_y_ties * (consecutive_y_ties - 1);
 
     let consecutive_y_ties_i = consecutive_y_ties as isize;
     *v2_part_2 += consecutive_y_ties_i * (consecutive_y_ties_i - 1) * (consecutive_y_ties_i - 2);
-    
+
     *tied_y_pairs += sum(consecutive_y_ties - 1);
 }
 
@@ -261,17 +308,18 @@ mod tests {
     #[test]
     fn xy_consecutive_pair_test() {
         let x = vec![
-            12.0, 14.0, 14.0, 17.0, 19.0, 19.0, 19.0, 19.0, 19.0, 20.0, 21.0, 21.0, 21.0, 21.0, 21.0,
-            22.0, 23.0, 24.0, 24.0, 24.0, 26.0, 26.0, 27.0,
+            12.0, 14.0, 14.0, 17.0, 19.0, 19.0, 19.0, 19.0, 19.0, 20.0, 21.0, 21.0, 21.0, 21.0,
+            21.0, 22.0, 23.0, 24.0, 24.0, 24.0, 26.0, 26.0, 27.0,
         ];
         let y = vec![
-            11.0, 4.0, 4.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 4.0, 0.0, 4.0, 0.0, 0.0, 0.0, 0.0, 4.0,
-            0.0, 0.0, 0.0, 0.0, 0.0,
+            11.0, 4.0, 4.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 4.0, 0.0, 4.0, 0.0, 0.0, 0.0, 0.0,
+            4.0, 0.0, 0.0, 0.0, 0.0, 0.0,
         ];
 
         let (tau_b, z) = tau_b_with_comparator(&x, &y, |a: &f64, b: &f64| {
             a.partial_cmp(&b).unwrap_or(Ordering::Greater)
-        }).unwrap();
+        })
+        .unwrap();
 
         approx::assert_abs_diff_eq!(tau_b, -0.3762015410475098);
         approx::assert_abs_diff_eq!(z, -2.09764910068664);
@@ -362,13 +410,33 @@ mod tests {
 
     #[test]
     fn it_format_dimension_mismatch_error() {
-        let error = Error::DimensionMismatch { expected: 2, got: 1 };
+        let error = Error::DimensionMismatch {
+            expected: 2,
+            got: 1,
+        };
         assert_eq!("dimension mismatch: 2 != 1", format!("{}", error));
     }
 
     #[test]
     fn it_format_insufficient_length_error() {
-        let error = Error::InsufficientLength {} ;
+        let error = Error::InsufficientLength {};
         assert_eq!("insufficient array length", format!("{}", error));
+    }
+
+    #[test]
+    /// Checks that lib does not panic subtracting some usize values
+    fn test_subtract_with_overflow() {
+        let x = vec![
+            -0.1309, -0.1309, -0.1309, -0.1309, -0.1309, -0.1309, -0.1309, -0.1309, -0.1309, 6.8901,
+        ];
+        let y = vec![1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0];
+
+        let result = std::panic::catch_unwind(|| {
+            let (_tau, _significance) = tau_b_with_comparator(&x, &y, |a: &f64, b: &f64| {
+                a.partial_cmp(&b).unwrap_or(Ordering::Greater)
+            })
+            .unwrap();
+        });
+        assert!(result.is_ok()); // Should not panic
     }
 }

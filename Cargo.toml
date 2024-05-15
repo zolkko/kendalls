@@ -5,7 +5,8 @@ version = "0.2.1"
 authors = [
 	"zolkko <zolkko@gmail.com>",
 	"Genaro Camele <genarocamele@gmail.com>",
-	"Matías Ignacio Caruso"
+	"Matías Ignacio Caruso",
+	"Sergio Leandro Calderón <bs.sergiocalderon@gmail.com>"
 ]
 
 include = ["src/**/*.rs", "Cargo.toml"]

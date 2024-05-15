@@ -154,33 +154,36 @@ where
             let i_end = n.min(i + segment_size);
             let mut j = i_end;
             let j_end = n.min(j + segment_size);
-
             let mut copy_location = offset;
-            while i < i_end || j < j_end {
-                if i < i_end {
-                    if j < j_end {
-                        let a = &pairs[i].1;
-                        let b = &pairs[j].1;
-                        if comparator(a, b) == Ordering::Greater {
-                            pairs_dest[copy_location] = pairs[j].clone();
-                            j += 1;
-                            swaps += i_end - i;
-                        } else {
-                            pairs_dest[copy_location] = pairs[i].clone();
-                            i += 1;
-                        }
-                    } else {
-                        pairs_dest[copy_location] = pairs[i].clone();
-                        i += 1;
-                    }
-                } else {
+
+            while i < i_end && j < j_end {
+                let a = &pairs[i].1;
+                let b = &pairs[j].1;
+
+                if a.partial_cmp(b).unwrap_or(Ordering::Greater) == Ordering::Greater {
                     pairs_dest[copy_location] = pairs[j].clone();
                     j += 1;
+                    swaps += i_end - i;
+                } else {
+                    pairs_dest[copy_location] = pairs[i].clone();
+                    i += 1;
                 }
+
                 copy_location += 1;
             }
-        }
 
+            while i < i_end {
+                pairs_dest[copy_location] = pairs[i].clone();
+                i += 1;
+                copy_location += 1
+            }
+
+            while j < j_end {
+                pairs_dest[copy_location] = pairs[j].clone();
+                j += 1;
+                copy_location += 1
+            }
+        }
         std::mem::swap(&mut pairs, &mut pairs_dest);
 
         segment_size <<= 1;

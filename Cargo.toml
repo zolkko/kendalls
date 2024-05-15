@@ -1,7 +1,7 @@
 [package]
 name = "kendalls"
 description = "Kendall's tau rank correlation"
-version = "0.2.1"
+version = "0.2.2"
 authors = [
 	"zolkko <zolkko@gmail.com>",
 	"Genaro Camele <genarocamele@gmail.com>",

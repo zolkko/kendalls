@@ -16,8 +16,8 @@ jobs:
           override: true
           toolchain: stable
       - uses: Swatinem/rust-cache@v2
-      - name: cargo test --locked
-        run: cargo test --locked --all-features --all-targets
+      - name: cargo test
+        run: cargo test --all-features --all-targets
 
   coverage:
     runs-on: ubuntu-latest

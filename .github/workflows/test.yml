@@ -1,0 +1,43 @@
+permissions:
+  contents: read
+on:
+  push:
+    branches: [main]
+  pull_request:
+name: test
+jobs:
+  unittests:
+    runs-on: ubuntu-latest
+    name: tests / stable
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rs/toolchain@v1
+        with:
+          override: true
+          toolchain: stable
+      - uses: Swatinem/rust-cache@v2
+      - name: cargo test --locked
+        run: cargo test --locked --all-features --all-targets
+
+  coverage:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    name: stable / coverage
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rs/toolchain@v1
+        with:
+          override: true
+          toolchain: stable
+      - name: Run cargo-tarpaulin
+        uses: actions-rs/tarpaulin@v0.1
+        with:
+          version: '0.27.2'
+          args: '--workspace --line'
+      - name: Upload to codecov.io
+        uses: codecov/codecov-action@v3
+        with:
+          verbose: true
+          fail_ci_if_error: true

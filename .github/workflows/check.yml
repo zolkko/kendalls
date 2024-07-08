@@ -1,0 +1,56 @@
+permissions:
+  contents: read
+on:
+  push:
+    branches: [main]
+  pull_request:
+name: check
+jobs:
+  rustfmt:
+    runs-on: ubuntu-latest
+    name: fmt
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust Toolchain Components
+        uses: actions-rs/toolchain@v1
+        with:
+          components: clippy, rustfmt
+          override: true
+          toolchain: stable
+      - name: rustfmt
+        run: cargo fmt --all -- --check
+
+  audit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
+    name: audit
+    steps:
+      - uses: actions/checkout@v4
+      - name: audit
+        uses: actions-rs/audit-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  clippy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
+    name: clippy
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust Toolchain Components
+        uses: actions-rs/toolchain@v1
+        with:
+          components: clippy, rustfmt
+          override: true
+          toolchain: stable
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions-rs/clippy-check@v1.0.7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: --all-features --all-targets

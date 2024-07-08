@@ -258,7 +258,7 @@ where
     let z = s / var_s.sqrt();
 
     // Limit range to fix computational errors
-    Ok((tau_b.max(-1.0).min(1.0), z))
+    Ok((tau_b.clamp(-1.0, 1.0), z))
 }
 
 #[inline]
@@ -320,7 +320,7 @@ mod tests {
         ];
 
         let (tau_b, z) = tau_b_with_comparator(&x, &y, |a: &f64, b: &f64| {
-            a.partial_cmp(&b).unwrap_or(Ordering::Greater)
+            a.partial_cmp(b).unwrap_or(Ordering::Greater)
         })
         .unwrap();
 
@@ -330,7 +330,7 @@ mod tests {
 
     #[test]
     fn shifted_test() {
-        let comparator = |a: &f64, b: &f64| a.partial_cmp(&b).unwrap_or(Ordering::Greater);
+        let comparator = |a: &f64, b: &f64| a.partial_cmp(b).unwrap_or(Ordering::Greater);
 
         let x = &[1.0, 1.0, 2.0, 2.0, 3.0, 3.0];
         let y = &[1.0, 2.0, 2.0, 3.0, 3.0, 4.0];
@@ -371,7 +371,7 @@ mod tests {
 
         assert_eq!(
             tau_b_with_comparator(x, y, |a: &f64, b: &f64| a
-                .partial_cmp(&b)
+                .partial_cmp(b)
                 .unwrap_or(Ordering::Greater)),
             Ok((expected_tau_b, expected_z))
         );
@@ -387,7 +387,7 @@ mod tests {
 
         assert_eq!(
             tau_b_with_comparator(&x, &y, |a: &f64, b: &f64| a
-                .partial_cmp(&b)
+                .partial_cmp(b)
                 .unwrap_or(Ordering::Greater)),
             Ok((0.0, 0.0))
         );
@@ -436,7 +436,7 @@ mod tests {
 
         let result = std::panic::catch_unwind(|| {
             let (_tau, _significance) = tau_b_with_comparator(&x, &y, |a: &f64, b: &f64| {
-                a.partial_cmp(&b).unwrap_or(Ordering::Greater)
+                a.partial_cmp(b).unwrap_or(Ordering::Greater)
             })
             .unwrap();
         });

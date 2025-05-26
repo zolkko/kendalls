@@ -90,7 +90,7 @@ where
 
     let mut pairs: Vec<(T, T)> = x.iter().cloned().zip(y.iter().cloned()).collect();
 
-    pairs.sort_by(|pair1, pair2| {
+    pairs.sort_unstable_by(|pair1, pair2| {
         let res = comparator(&pair1.0, &pair2.0);
         if res == Ordering::Equal {
             comparator(&pair1.1, &pair2.1)

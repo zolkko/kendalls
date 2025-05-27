@@ -1,5 +1,5 @@
 //! [Kendall's tau rank correlation](https://en.wikipedia.org/wiki/Kendall_rank_correlation_coefficient).
-//! Initially the library was based o
+//! Initially the library was based on
 //! [Apache Commons Math](http://commons.apache.org/proper/commons-math/) library with some
 //! additions taken from [scipy](https://github.com/scipy/scipy)
 //! and R [cor.test](https://github.com/SurajGupta/r-source/blob/master/src/library/stats/R/cor.test.R) function.

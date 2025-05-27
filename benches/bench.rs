@@ -1,9 +1,5 @@
-extern crate criterion;
-extern crate kendalls;
-extern crate rand;
-extern crate rand_distr;
-
-use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
+use std::hint::black_box;
+use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion};
 use kendalls::tau_b_with_comparator;
 use rand::prelude::*;
 use rand_distr::StandardNormal;
@@ -25,7 +21,7 @@ fn criterion_benchmark(c: &mut Criterion) {
 
     for n in [100, 1000, 10_000] {
         let (x, y) = generate_data(n);
-        group.bench_with_input(BenchmarkId::new("taub", n), &n, |b, &n| {
+        group.bench_with_input(BenchmarkId::new("taub", n), &n, |b, _| {
             b.iter(|| {
                 tau_b_with_comparator(
                     black_box(&x),

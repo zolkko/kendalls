@@ -43,7 +43,7 @@ impl Display for Error {
         match self {
             Error::InsufficientLength => write!(f, "insufficient array length"),
             Error::DimensionMismatch { expected, got } => {
-                write!(f, "dimension mismatch: {} != {}", expected, got)
+                write!(f, "dimension mismatch: {expected} != {got}")
             }
         }
     }

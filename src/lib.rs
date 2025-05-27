@@ -1,8 +1,8 @@
 //! [Kendall's tau rank correlation](https://en.wikipedia.org/wiki/Kendall_rank_correlation_coefficient).
-//! At this point this is basically a copy-paste
-//! from [Apache Commons Math](http://commons.apache.org/proper/commons-math/) library with some
+//! Initially the library was based on
+//! [Apache Commons Math](http://commons.apache.org/proper/commons-math/) library with some
 //! additions taken from [scipy](https://github.com/scipy/scipy)
-//! and R [cor.test](https://github.com/SurajGupta/r-source/blob/master/src/library/stats/R/cor.test.R) function
+//! and R [cor.test](https://github.com/SurajGupta/r-source/blob/master/src/library/stats/R/cor.test.R) function.
 //!
 //! Example usage:
 //! ```
@@ -43,7 +43,7 @@ impl Display for Error {
         match self {
             Error::InsufficientLength => write!(f, "insufficient array length"),
             Error::DimensionMismatch { expected, got } => {
-                write!(f, "dimension mismatch: {} != {}", expected, got)
+                write!(f, "dimension mismatch: {expected} != {got}")
             }
         }
     }
@@ -305,8 +305,8 @@ fn update_y_group(
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
+    use float_cmp::assert_approx_eq;
 
     #[test]
     fn xy_consecutive_pair_test() {
@@ -324,8 +324,8 @@ mod tests {
         })
         .unwrap();
 
-        approx::assert_abs_diff_eq!(tau_b, -0.3762015410475098);
-        approx::assert_abs_diff_eq!(z, -2.09764910068664);
+        assert_approx_eq!(f64, tau_b, -0.3762015410475098);
+        assert_approx_eq!(f64, z, -2.09764910068664);
     }
 
     #[test]
@@ -335,28 +335,28 @@ mod tests {
         let x = &[1.0, 1.0, 2.0, 2.0, 3.0, 3.0];
         let y = &[1.0, 2.0, 2.0, 3.0, 3.0, 4.0];
         let (tau_b, z) = tau_b_with_comparator(&x[..], &y[..], comparator).unwrap();
-        approx::assert_abs_diff_eq!(tau_b, 0.8006407690254358);
-        approx::assert_abs_diff_eq!(z, 2.0526, epsilon = 0.0001);
+        assert_approx_eq!(f64, tau_b, 0.8006407690254358);
+        assert_approx_eq!(f64, z, 2.0526, epsilon = 0.0001);
 
         let x = &[12.0, 2.0, 1.0, 12.0, 2.0];
         let y = &[1.0, 4.0, 7.0, 1.0, 0.0];
         let (tau_b, z) = tau_b_with_comparator(&x[..], &y[..], comparator).unwrap();
-        approx::assert_abs_diff_eq!(tau_b, -0.4714045207910316);
-        approx::assert_abs_diff_eq!(z, -1.0742, epsilon = 0.0001);
+        assert_approx_eq!(f64, tau_b, -0.4714045207910316);
+        assert_approx_eq!(f64, z, -1.0742, epsilon = 0.0001);
     }
 
     #[test]
     fn simple_correlated_data() {
         let (tau_b, z) = tau_b(&[1, 2, 3], &[3, 4, 5]).unwrap();
         assert_eq!(tau_b, 1.0);
-        approx::assert_abs_diff_eq!(z, 1.5666989036012806);
+        assert_approx_eq!(f64, z, 1.5666989036012806);
     }
 
     #[test]
     fn simple_correlated_reversed() {
         let (tau_b, z) = tau_b(&[1, 2, 3], &[5, 4, 3]).unwrap();
         assert_eq!(tau_b, -1.0);
-        approx::assert_abs_diff_eq!(z, -1.5666989036012806);
+        assert_approx_eq!(f64, z, -1.5666989036012806);
     }
 
     #[test]

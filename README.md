@@ -12,7 +12,7 @@ Add this to your Cargo.toml:
 
 ```toml
 [dependencies]
-kendalls = "0.2.2"
+kendalls = "1.0.0"
 ```
 
 and this to your crate root:

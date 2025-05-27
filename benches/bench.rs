@@ -1,10 +1,9 @@
-use std::hint::black_box;
-use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion};
+use criterion::{BenchmarkId, Criterion, criterion_group, criterion_main};
 use kendalls::tau_b_with_comparator;
 use rand::prelude::*;
 use rand_distr::StandardNormal;
+use std::hint::black_box;
 use std::time::Duration;
-
 
 fn generate_data(len: usize) -> (Vec<f64>, Vec<f64>) {
     let mut rng = rand::rng();

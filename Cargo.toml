@@ -18,6 +18,10 @@ license = "MIT"
 keywords = [ "statistics", "correlation" ]
 categories = [ "algorithms", "science" ]
 
+[[bench]]
+name = "bench"
+harness = false
+
 [badges]
 travis-ci = { repository = "zolkko/kendalls", branch = "master" }
 codecov = { repository = "zolkko/kendalls", branch = "master", service = "github" }
@@ -26,3 +30,6 @@ codecov = { repository = "zolkko/kendalls", branch = "master", service = "github
 
 [dev-dependencies]
 approx = "0.5"
+criterion = "0.6"
+rand = "0.9"
+rand_distr = "0.5"

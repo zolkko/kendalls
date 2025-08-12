@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     name: tests / stable
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions-rs/toolchain@v1
         with:
           override: true
@@ -26,7 +26,7 @@ jobs:
       options: --security-opt seccomp=unconfined
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Generate code coverage
         run: |

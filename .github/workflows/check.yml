@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     name: fmt
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install Rust Toolchain Components
         uses: actions-rs/toolchain@v1
         with:
@@ -28,7 +28,7 @@ jobs:
       pull-requests: write
     name: audit
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: audit
         uses: actions-rs/audit-check@v1
         with:
@@ -42,7 +42,7 @@ jobs:
       pull-requests: write
     name: clippy
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install Rust Toolchain Components
         uses: actions-rs/toolchain@v1
         with:
